@@ -1,0 +1,9 @@
+fastapi
+uvicorn
+openai
+google-generativeai
+langchain
+sse-starlette
+google-generativeai
+langchain_openai
+dotenv
