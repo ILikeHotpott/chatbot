@@ -1,0 +1,46 @@
+name: Deploy Chatbot to EC2
+
+on:
+  push:
+    branches: [ main ]
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v3
+
+      - name: Set up SSH
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.EC2_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          ssh-keyscan -H ${{ secrets.EC2_HOST }} >> ~/.ssh/known_hosts
+
+      - name: Rsync code to EC2
+        run: |
+          rsync -avz --delete ./ ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }}:/home/ec2-user/chatbot/
+
+      - name: Remote Build and Start
+        run: |
+          ssh ${{ secrets.EC2_USER }}@${{ secrets.EC2_HOST }} << 'EOF'
+            set -e
+            cd /home/ec2-user/chatbot
+
+            echo "========== Frontend =========="
+            cd apps/web
+            npm install
+            npm run build
+            pm2 stop chatbot-frontend || true
+            pm2 start npm --name chatbot-frontend -- start
+            cd ../../
+
+            echo "========== Backend =========="
+            cd backend
+            source venv/bin/activate || python3 -m venv venv && source venv/bin/activate
+            pip install -r requirements.txt
+            pm2 stop chatbot-backend || true
+            pm2 start "uvicorn main:app --host 0.0.0.0 --port 8000" --name chatbot-backend
+          EOF
