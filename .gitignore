@@ -1,0 +1,42 @@
+# --- Python 相关 ---
+*.pyc
+__pycache__/
+*.pyo
+*.pyd
+*.db
+*.db-shm
+*.db-wal
+.env
+venv/
+backend/venv/
+
+# SQLite 数据库文件
+backend/db/*.db
+backend/db/*.db-shm
+backend/db/*.db-wal
+
+# --- Node.js / Next.js 前端 ---
+node_modules/
+apps/web/node_modules/
+apps/web/.next/
+apps/web/.turbo/
+apps/web/.env.local
+apps/web/.env
+apps/web/.eslintcache
+apps/web/.vercel/
+
+# 前端构建输出（如 desktop 应用的 dist）
+apps/desktop/dist/
+apps/desktop/node_modules/
+apps/desktop/.env
+
+# --- 编辑器配置文件 ---
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# --- macOS 系统文件 ---
+.DS_Store
+
+config/
